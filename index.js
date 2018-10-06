@@ -3,6 +3,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, label, prettyPrint } = format;
 const fs = require('fs');
+const moment = require('moment-timezone');
+const CronJob = require('cron').CronJob;
 
 const logger = createLogger({
     level: 'info',
@@ -46,25 +48,57 @@ function saveData() {
     fs.writeFile('./data.json', json, 'utf8');
 }
 
-if (typeof data == 'undefined' || data == null ||
-    typeof data.chatids == 'undefined' || data.chatids == null) {
+if (typeof data == 'undefined' || data == null) {
     logger.info('No data.json');
     var data = {
-        chatids: []
+        chatids: [],
+        tzmap: {}
     };
+    saveData();
+}
+
+if (typeof data.chatids == 'undefined' || data.chatids == null) {
+    data.chatids = [];
+    saveData();
+}
+
+if (typeof data.tzmap == 'undefined' || data.tzmap == null) {
+    data.tzmap = {};
     saveData();
 }
 
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    if (data.chatids.includes(chatId)) {
+    if (chatId in data.chatmap) {
         bot.sendMessage(chatId, 'Already started, chat ID: ' + chatId);
         return;
     }
     data.chatids.push(chatId);
+    data.tzmap[chatId] = 'Asia/Shanghai';
     saveData();
     logger.info(chatId + ' started');
     bot.sendMessage(chatId, 'Started, chat ID: ' + chatId);
+});
+
+bot.onText(/^\/timezone(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
+    const chatId = msg.chat.id;
+    if (match[3]) {
+        if (moment.tz.zone(match[3])) {
+            logger.info(chatId + ' set timezone to ' + match[3]);
+            bot.sendMessage(chatId, 'Set timezone to ' + match[3]);
+            data.tzmap[chatId] = match[3];
+            saveData();
+        } else {
+            bot.sendMessage(chatId, 'Invalid timezone: ' + match[3]);
+        }
+    } else {
+        let tz = data.tzmap[chatId];
+        if (tz) {
+            bot.sendMessage(chatId, 'Current timezone: ' + data.tzmap[chatId]);
+        } else {
+            bot.sendMessage(chatId, 'Timezone not set, by default Asia/Shanghai.');
+        }
+    }
 });
 
 bot.onText(/\/stop/, (msg) => {
@@ -103,13 +137,15 @@ bot.on('polling_error', (error) => {
   logger.error(error);  // => 'EFATAL'
 });
 
-var CronJob = require('cron').CronJob;
-var cron = new CronJob('0 * * * *', function() {
+var cron = new CronJob('* * * * *', function() {
     var date = new Date();
     logger.info('Cron triggered: ' + date + ', send sticker to ' + data.chatids.length + ' chats');
-    var hour = date.getHours();
-    hour = (hour + 8) % 12;
     data.chatids.forEach(function (id) {
-        bot.sendSticker(id, stickers[hour]);
+        let tz = data.tzmap[id];
+        if (!tz) {
+            tz = 'Asia/Shanghai';
+        }
+        let hour = moment().tz(tz).hours();
+        bot.sendSticker(id, stickers[hour % 12]);
     });
 }, null, true, 'Asia/Shanghai');

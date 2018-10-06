@@ -9,6 +9,10 @@ This is a [Telegram](https://telegram.org/) bot sending a sticker telling time e
 
 **Stop sending stickers:** `/stop`
 
+**Set timezone:** `/timezone Asia/Shanghai`
+
+*List of timezones in tz database: [https://en.wikipedia.org/wiki/List_of_tz_database_time_zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)*
+
 ## Environment
 - Node.js 8.0+
 

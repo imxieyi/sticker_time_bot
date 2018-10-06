@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/imxieyi/unifound_bot.git"
+    "url": "git+https://github.com/imxieyi/sticker_time_bot.git"
   },
   "keywords": [
     "sustech",
@@ -20,11 +20,13 @@
   "author": "imxieyi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/imxieyi/unifound_bot/issues"
+    "url": "https://github.com/imxieyi/sticker_time_bot/issues"
   },
-  "homepage": "https://github.com/imxieyi/unifound_bot#readme",
+  "homepage": "https://github.com/imxieyi/sticker_time_bot#readme",
   "dependencies": {
     "cron": "^1.4.1",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.21",
     "node-telegram-bot-api": "^0.30.0",
     "winston": "^3.1.0"
   }
