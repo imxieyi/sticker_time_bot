@@ -1,0 +1,31 @@
+{
+  "name": "sticker_time_bot",
+  "version": "1.0.0",
+  "description": "Sticker Time Bot for Telegram",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imxieyi/unifound_bot.git"
+  },
+  "keywords": [
+    "sustech",
+    "unifound",
+    "bot",
+    "telegram"
+  ],
+  "author": "imxieyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imxieyi/unifound_bot/issues"
+  },
+  "homepage": "https://github.com/imxieyi/unifound_bot#readme",
+  "dependencies": {
+    "cron": "^1.4.1",
+    "node-telegram-bot-api": "^0.30.0",
+    "winston": "^3.1.0"
+  }
+}
