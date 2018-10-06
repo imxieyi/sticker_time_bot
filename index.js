@@ -137,7 +137,7 @@ bot.on('polling_error', (error) => {
   logger.error(error);  // => 'EFATAL'
 });
 
-var cron = new CronJob('* * * * *', function() {
+var cron = new CronJob('0 * * * *', function() {
     var date = new Date();
     logger.info('Cron triggered: ' + date + ', send sticker to ' + data.chatids.length + ' chats');
     data.chatids.forEach(function (id) {
