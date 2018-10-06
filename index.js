@@ -69,7 +69,7 @@ if (typeof data.tzmap == 'undefined' || data.tzmap == null) {
 
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    if (chatId in data.chatmap) {
+    if (chatId in data.chatids) {
         bot.sendMessage(chatId, 'Already started, chat ID: ' + chatId);
         return;
     }
