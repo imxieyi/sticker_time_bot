@@ -75,9 +75,6 @@ bot.onText(/\/start/, (msg) => {
         return;
     }
     data.chatids.push(chatId);
-    if (!(data.tzmap[chatId])) {
-        data.tzmap[chatId] = 'Asia/Shanghai';
-    }
     saveData();
     logger.info(chatId + ' started');
     bot.sendMessage(chatId, 'Started, chat ID: ' + chatId);
