@@ -146,6 +146,21 @@ var cron = new CronJob('0 * * * *', function() {
             tz = 'Asia/Shanghai';
         }
         let hour = moment().tz(tz).hours();
-        bot.sendSticker(id, stickers[hour % 12]);
+        bot.sendSticker(id, stickers[hour % 12]).catch(error => {
+            let query = error.response.request.uri.query;
+            if (query) {
+                let matches = query.match(/chat_id=(-?[0-9]*)&/);
+                if (matches && matches[1]) {
+                    let cid = Number(matches[1]);
+                    logger.info('Blocked by ' + cid);
+                    let index = data.chatids.indexOf(cid);
+                    if (index > -1) {
+                        data.chatids.splice(index, 1);
+                        delete data.tzmap[cid];
+                        saveData();
+                    }
+                }
+            }
+        })
     });
 }, null, true, 'Asia/Shanghai');
