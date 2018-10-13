@@ -163,6 +163,7 @@ var cron = new CronJob('0 * * * *', function() {
                 bot.deleteMessage(cid, data.lastid[cid]);
             }
             data.lastid[cid] = mid;
+            saveData();
         }).catch(error => {
             let query = error.response.request.uri.query;
             if (query) {
