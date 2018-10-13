@@ -81,6 +81,7 @@ bot.onText(/\/start/, (msg) => {
         return;
     }
     data.chatids.push(chatId);
+    delete data.lastid[chatId];
     saveData();
     logger.info(chatId + ' started');
     bot.sendMessage(chatId, 'Started, chat ID: ' + chatId);
@@ -112,6 +113,7 @@ bot.onText(/\/stop/, (msg) => {
     let index = data.chatids.indexOf(chatId);
     if (index > -1) {
         data.chatids.splice(index, 1);
+        delete data.lastid[chatId];
         saveData();
     } else {
         bot.sendMessage(chatId, 'Not started, chat ID: ' + chatId);
@@ -175,6 +177,7 @@ var cron = new CronJob('0 * * * *', function() {
                     if (index > -1) {
                         data.chatids.splice(index, 1);
                         delete data.tzmap[cid];
+                        delete data.lastid[cid];
                         saveData();
                     }
                 }
