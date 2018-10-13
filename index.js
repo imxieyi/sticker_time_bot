@@ -52,7 +52,8 @@ if (typeof data == 'undefined' || data == null) {
     logger.info('No data.json');
     var data = {
         chatids: [],
-        tzmap: {}
+        tzmap: {},
+        lastid: {}
     };
     saveData();
 }
@@ -64,6 +65,11 @@ if (typeof data.chatids == 'undefined' || data.chatids == null) {
 
 if (typeof data.tzmap == 'undefined' || data.tzmap == null) {
     data.tzmap = {};
+    saveData();
+}
+
+if (typeof data.lastid == 'undefined' || data.lastid == null) {
+    data.lastid = {};
     saveData();
 }
 
@@ -146,7 +152,14 @@ var cron = new CronJob('0 * * * *', function() {
             tz = 'Asia/Shanghai';
         }
         let hour = moment().tz(tz).hours();
-        bot.sendSticker(id, stickers[hour % 12]).catch(error => {
+        bot.sendSticker(id, stickers[hour % 12]).then(message => {
+            let cid = message.chat.id;
+            let mid = message.message_id;
+            if (data.lastid[cid]) {
+                bot.deleteMessage(cid, data.lastid[cid]);
+            }
+            data.lastid[cid] = mid;
+        }).catch(error => {
             let query = error.response.request.uri.query;
             if (query) {
                 let matches = query.match(/chat_id=(-?[0-9]*)&/);
