@@ -140,7 +140,11 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
 // });
 
 bot.on('polling_error', (error) => {
-  logger.error(error);  // => 'EFATAL'
+    logger.error('[polling_error] ' + error.code);  // => 'EFATAL'
+});
+
+bot.on('webhook_error', (error) => {
+    logger.error('[webhook_error] ' + error.code);  // => 'EPARSE'
 });
 
 var cron = new CronJob('0 * * * *', function() {
