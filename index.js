@@ -168,7 +168,7 @@ var cron = new CronJob('0 * * * *', function() {
             saveData();
         }).catch(error => {
             let query = error.response.request.uri.query;
-            if (query) {
+            if (query && error.response.body.error_code === 403 && 'blocked' in error.response.body.description) {
                 let matches = query.match(/chat_id=(-?[0-9]*)&/);
                 if (matches && matches[1]) {
                     let cid = Number(matches[1]);
