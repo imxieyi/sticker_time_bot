@@ -135,7 +135,7 @@ bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
         }
     } else {
         if (chatId in data.autodelete) {
-            bot.sendMessage(chatId, 'Auto deleting status: ' + data.autodelete[chatId] ? 'on' : 'off');
+            bot.sendMessage(chatId, 'Auto deleting status: ' + (data.autodelete[chatId] ? 'on' : 'off'));
         } else {
             bot.sendMessage(chatId, 'Auto deleting not set, by default off.');
         }
