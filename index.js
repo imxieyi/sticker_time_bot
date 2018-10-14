@@ -53,7 +53,8 @@ if (typeof data == 'undefined' || data == null) {
     var data = {
         chatids: [],
         tzmap: {},
-        lastid: {}
+        lastid: {},
+        autodelete: {}
     };
     saveData();
 }
@@ -70,6 +71,11 @@ if (typeof data.tzmap == 'undefined' || data.tzmap == null) {
 
 if (typeof data.lastid == 'undefined' || data.lastid == null) {
     data.lastid = {};
+    saveData();
+}
+
+if (typeof data.autodelete == 'undefined' || data.autodelete == null) {
+    data.autodelete = {};
     saveData();
 }
 
@@ -106,6 +112,35 @@ bot.onText(/^\/timezone(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
             bot.sendMessage(chatId, 'Timezone not set, by default Asia/Shanghai.');
         }
     }
+});
+
+bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg) => {
+    const chatId = msg.chat.id;
+    let index = data.chatids.indexOf(chatId);
+    if (index > -1) {
+        bot.sendMessage(chatId, 'Not started, chat ID: ' + chatId);
+        return;
+    }
+    if (match[3]) {
+        if (match[3] === 'on') {
+            bot.sendMessage(chatId, 'Enable auto deleting');
+            data.autodelete[chatId] = false;
+            saveData();
+        } else if (match[3] === 'off') {
+            bot.sendMessage(chatId, 'Disable auto deleting');
+            data.autodelete[chatId] = true;
+            saveData();
+        } else {
+            bot.sendMessage(chatId, 'Unknown command');
+        }
+    } else {
+        if (chatId in data.autodelete) {
+            bot.sendMessage(chatId, 'Auto deleting status: ' + data.autodelete[chatId] ? 'on' : 'off');
+        } else {
+            bot.sendMessage(chatId, 'Auto deleting not set, by default off.');
+        }
+    }
+    logger.info(chatId + ' set autodelete: ' + data.autodelete[chatId]);
 });
 
 bot.onText(/\/stop/, (msg) => {
@@ -161,7 +196,7 @@ var cron = new CronJob('0 * * * *', function() {
         bot.sendSticker(id, stickers[hour % 12]).then(message => {
             let cid = message.chat.id;
             let mid = message.message_id;
-            if (data.lastid[cid]) {
+            if (data.autodelete[cid] && data.lastid[cid]) {
                 bot.deleteMessage(cid, data.lastid[cid]);
             }
             data.lastid[cid] = mid;
@@ -179,6 +214,7 @@ var cron = new CronJob('0 * * * *', function() {
                         data.chatids.splice(index, 1);
                         delete data.tzmap[cid];
                         delete data.lastid[cid];
+                        delete data.autodelete[cid];
                         saveData();
                     }
                 }
