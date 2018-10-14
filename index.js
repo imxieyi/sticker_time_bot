@@ -114,21 +114,21 @@ bot.onText(/^\/timezone(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     }
 });
 
-bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg) => {
+bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     const chatId = msg.chat.id;
     let index = data.chatids.indexOf(chatId);
-    if (index > -1) {
+    if (index <= -1) {
         bot.sendMessage(chatId, 'Not started, chat ID: ' + chatId);
         return;
     }
     if (match[3]) {
         if (match[3] === 'on') {
             bot.sendMessage(chatId, 'Enable auto deleting');
-            data.autodelete[chatId] = false;
+            data.autodelete[chatId] = true;
             saveData();
         } else if (match[3] === 'off') {
             bot.sendMessage(chatId, 'Disable auto deleting');
-            data.autodelete[chatId] = true;
+            data.autodelete[chatId] = false;
             saveData();
         } else {
             bot.sendMessage(chatId, 'Unknown command');
