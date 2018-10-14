@@ -126,10 +126,12 @@ bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
             bot.sendMessage(chatId, 'Enable auto deleting');
             data.autodelete[chatId] = true;
             saveData();
+            logger.info(chatId + ' set autodelete: on');
         } else if (match[3] === 'off') {
             bot.sendMessage(chatId, 'Disable auto deleting');
             data.autodelete[chatId] = false;
             saveData();
+            logger.info(chatId + ' set autodelete: off');
         } else {
             bot.sendMessage(chatId, 'Unknown command');
         }
@@ -140,7 +142,6 @@ bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
             bot.sendMessage(chatId, 'Auto deleting not set, by default off.');
         }
     }
-    logger.info(chatId + ' set autodelete: ' + data.autodelete[chatId]);
 });
 
 bot.onText(/\/stop/, (msg) => {
