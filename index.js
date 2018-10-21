@@ -207,7 +207,8 @@ var cron = new CronJob('0 * * * *', function() {
             logger.error('[' + error.response.body.error_code + ']' + error.response.body.description);  // => 'ETELEGRAM'
             if (query && error.response.body.error_code === 403 &&
                (error.response.body.description.includes('blocked') ||
-                error.response.body.description.includes('kicked'))) {
+                error.response.body.description.includes('kicked') ||
+                error.response.body.description.includes('not a member'))) {
                 let matches = query.match(/chat_id=(-?[0-9]*)&/);
                 if (matches && matches[1]) {
                     let cid = Number(matches[1]);
