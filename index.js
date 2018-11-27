@@ -224,7 +224,7 @@ bot.on('webhook_error', (error) => {
     logger.error('[webhook_error] ' + error.code);  // => 'EPARSE'
 });
 
-var cron = new CronJob('* * * * *', function() {
+var cron = new CronJob('0 * * * *', function() {
     var date = new Date();
     logger.info('Cron triggered: ' + date + ', send sticker to ' + data.chatids.length + ' chats');
     data.chatids.forEach(function (id) {
