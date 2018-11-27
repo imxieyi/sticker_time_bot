@@ -161,7 +161,7 @@ bot.onText(/\/sleeptime (\d+)/, (msg, match) => {
     const chatId = msg.chat.id;
     // bot.sendMessage(chatId, match[0]+'  '+match[1]+'  '+match[2]+'  '+match[3])
     if (match[1]) {
-        if (match[1] <= 60 && match[1] >= 0){
+        if (match[1] <= 23 && match[1] >= 0){
             logger.info(chatId + ' set sleeptime to '+match[1]+':00');
             bot.sendMessage(chatId, 'Set sleeptime to '+match[1]+':00');
             data.sleeptime[chatId] = match[1]
