@@ -32,7 +32,10 @@ const stickers = [
     'CAADBQAD-wADDxXNGe8aqxEu9OCLAg',
     'CAADBQAD_AADDxXNGSb44I6FN-UzAg',
     'CAADBQAD_QADDxXNGYGYV17DXBbkAg',
-    'CAADBQAD_gADDxXNGWuj_Z6psGN4Ag'
+    'CAADBQAD_gADDxXNGWuj_Z6psGN4Ag',
+    'CAADBQADCAAD7Dx2Ikbxv7doe-meAg', // still working!
+    'CAADBQADDAAD7Dx2IpKz4vfpPlrCAg', // stupid human!
+    'CAADBQADBQAD7Dx2IlqNSpG32Rg4Ag'  // get up!
 ];
 
 const bot = new TelegramBot(token, { polling: true });
@@ -100,6 +103,7 @@ bot.onText(/\/start/, (msg) => {
     saveData();
     logger.info(chatId + ' started');
     bot.sendMessage(chatId, 'Started, chat ID: ' + chatId);
+    bot.sendSticker(chatId, stickers[12])
 });
 
 bot.onText(/^\/timezone(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
@@ -164,6 +168,7 @@ bot.onText(/\/sleeptime (\d+)/, (msg, match) => {
             saveData();
         } else {
             bot.sendMessage(chatId, 'Invalid time, 0-23 expected');
+            bot.sendSticker(chatId, stickers[13])
         }
     }
 });
@@ -178,6 +183,7 @@ bot.onText(/\/waketime (\d+)/, (msg, match) => {
             saveData();
         } else {
             bot.sendMessage(chatId, 'Invalid time, 0-23 expected');
+            bot.sendSticker(chatId, stickers[13])
         }
     }
 });
@@ -243,8 +249,9 @@ var cron = new CronJob('0 * * * *', function() {
             if (sleep > wake) {
                 if (hour > sleep || hour < wake) return;
             }
-
-
+            if (hour == wake) {
+                bot.sendSticker(id, stickers[14])
+            }
         }
         bot.sendSticker(id, stickers[hour % 12]).then(message => {
         let cid = message.chat.id;
