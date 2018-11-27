@@ -176,7 +176,7 @@ bot.onText(/\/sleeptime (\d+)/, (msg, match) => {
 bot.onText(/\/waketime (\d+)/, (msg, match) => {
     const chatId = msg.chat.id;
     if (match[1]) {
-        if (match[1] <= 60 && match[1] >= 0){
+        if (match[1] <= 23 && match[1] >= 0){
             logger.info(chatId + ' set waketime to '+match[1]+':00');
             bot.sendMessage(chatId, 'Set waketime to '+match[1]+':00');
             data.waketime[chatId] = match[1]
