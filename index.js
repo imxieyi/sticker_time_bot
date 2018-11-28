@@ -262,13 +262,13 @@ var cron = new CronJob('0 * * * *', function() {
             }
         }
         bot.sendSticker(id, stickers[hour % 12]).then(message => {
-        let cid = message.chat.id;
-        let mid = message.message_id;
-        if (data.autodelete[cid] && data.lastid[cid]) {
-            bot.deleteMessage(cid, data.lastid[cid]);
-        }
-        data.lastid[cid] = mid;
-        saveData();
+            let cid = message.chat.id;
+            let mid = message.message_id;
+            if (data.autodelete[cid] && data.lastid[cid]) {
+                bot.deleteMessage(cid, data.lastid[cid]);
+            }
+            data.lastid[cid] = mid;
+            saveData();
         }).catch(error => {
             let query = error.response.request.uri.query;
             logger.error('[' + error.response.body.error_code + ']' + error.response.body.description);  // => 'ETELEGRAM'
