@@ -248,7 +248,7 @@ var cron = new CronJob('0 * * * *', function() {
         }
         let hour = moment().tz(tz).hours();
 
-        if (data.sleeptime[id] && data.waketime[id]) {
+        if (id in data.sleeptime && id in data.waketime) {
             let sleep = data.sleeptime[id];
             let wake = data.waketime[id];
             if (sleep < wake) {
