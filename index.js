@@ -156,15 +156,15 @@ bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
 bot.onText(/^\/sleeptime(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     const chatId = msg.chat.id;
     // bot.sendMessage(chatId, match[0]+'  '+match[1]+'  '+match[2]+'  '+match[3])
-    if (match[1]) {
+    if (match[3]) {
         var num = parseInt(match[3], 10);
         if (num <= 23 && num >= 0){
-            logger.info(chatId + ' set sleeptime to '+match[1]+':00');
-            bot.sendMessage(chatId, 'Set sleeptime to '+match[1]+':00');
-            data.sleeptime[chatId] = match[1]
+            logger.info(chatId + ' set sleeptime to '+ num +':00');
+            bot.sendMessage(chatId, 'Set sleeptime to '+ num +':00');
+            data.sleeptime[chatId] = num;
             saveData();
         } else {
-            bot.sendMessage(chatId, match[1]+' is a invalid time, 0-23 expected');
+            bot.sendMessage(chatId, match[3]+' is a invalid time, 0-23 expected');
         }
     } else {
         if (chatId in data.sleeptime) {
@@ -180,12 +180,12 @@ bot.onText(/^\/waketime(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     if (match[3]) {
         var num = parseInt(match[3], 10);
         if (num <= 23 && num >= 0){
-            logger.info(chatId + ' set waketime to '+match[1]+':00');
-            bot.sendMessage(chatId, 'Set waketime to '+match[1]+':00');
-            data.waketime[chatId] = match[1]
+            logger.info(chatId + ' set waketime to '+ num +':00');
+            bot.sendMessage(chatId, 'Set waketime to '+ num +':00');
+            data.waketime[chatId] = num;
             saveData();
         } else {
-            bot.sendMessage(chatId, match[1]+' is a invalid time, 0-23 expected');
+            bot.sendMessage(chatId, match[3]+' is a invalid time, 0-23 expected');
         }
     } else {
         if (chatId in data.waketime) {
