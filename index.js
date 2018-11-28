@@ -249,16 +249,13 @@ var cron = new CronJob('0 * * * *', function() {
         let hour = moment().tz(tz).hours();
 
         if (data.sleeptime[id] && data.waketime[id]) {
-            sleep = parseInt(data.sleeptime[id], 10);
-            wake = parseInt(data.waketime[id], 10);
+            let sleep = data.sleeptime[id];
+            let wake = data.waketime[id];
             if (sleep < wake) {
                 if (hour > sleep && hour < wake) return;
             }
             if (sleep > wake) {
                 if (hour > sleep || hour < wake) return;
-            }
-            if (hour == wake) {
-                bot.sendSticker(id, stickers[14])
             }
         }
         bot.sendSticker(id, stickers[hour % 12]).then(message => {
