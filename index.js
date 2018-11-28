@@ -284,6 +284,8 @@ var cron = new CronJob('0 * * * *', function() {
                         delete data.tzmap[cid];
                         delete data.lastid[cid];
                         delete data.autodelete[cid];
+                        delete data.sleeptime[cid];
+                        delete data.waketime[cid];
                         saveData();
                     }
                 }
