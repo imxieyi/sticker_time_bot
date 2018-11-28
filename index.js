@@ -165,6 +165,12 @@ bot.onText(/\/sleeptime (\d+)/, (msg, match) => {
         } else {
             bot.sendMessage(chatId, match[1]+' is a invalid time, 0-23 expected');
         }
+    } else {
+        if (chatId in data.sleeptime) {
+            bot.sendMessage(chatId, "Current sleep time: " + data.sleeptime[chatId]);
+        } else {
+            bot.sendMessage(chatId, "Sleep time not set");
+        }
     }
 });
 
@@ -178,6 +184,12 @@ bot.onText(/\/waketime (\d+)/, (msg, match) => {
             saveData();
         } else {
             bot.sendMessage(chatId, match[1]+' is a invalid time, 0-23 expected');
+        }
+    } else {
+        if (chatId in data.waketime) {
+            bot.sendMessage(chatId, "Current wake time: " + data.waketime[chatId]);
+        } else {
+            bot.sendMessage(chatId, "Wake time not set");
         }
     }
 });
