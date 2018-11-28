@@ -74,6 +74,15 @@ if (typeof data.lastid == 'undefined' || data.lastid == null) {
     saveData();
 }
 
+if (typeof data.sleeptime == 'undefined' || data.sleeptime == null) {
+    data.sleeptime = {};
+    saveData();
+}
+
+if (typeof data.waketime == 'undefined' || data.waketime == null) {
+    data.waketime = {};
+    saveData();
+}
 if (typeof data.autodelete == 'undefined' || data.autodelete == null) {
     data.autodelete = {};
     saveData();
@@ -144,6 +153,36 @@ bot.onText(/^\/autodelete(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     }
 });
 
+bot.onText(/\/sleeptime (\d+)/, (msg, match) => {
+    const chatId = msg.chat.id;
+    // bot.sendMessage(chatId, match[0]+'  '+match[1]+'  '+match[2]+'  '+match[3])
+    if (match[1]) {
+        if (match[1] <= 23 && match[1] >= 0){
+            logger.info(chatId + ' set sleeptime to '+match[1]+':00');
+            bot.sendMessage(chatId, 'Set sleeptime to '+match[1]+':00');
+            data.sleeptime[chatId] = match[1]
+            saveData();
+        } else {
+            bot.sendMessage(chatId, match[1]+' is a invalid time, 0-23 expected');
+        }
+    }
+});
+
+bot.onText(/\/waketime (\d+)/, (msg, match) => {
+    const chatId = msg.chat.id;
+    if (match[1]) {
+        if (match[1] <= 23 && match[1] >= 0){
+            logger.info(chatId + ' set waketime to '+match[1]+':00');
+            bot.sendMessage(chatId, 'Set waketime to '+match[1]+':00');
+            data.waketime[chatId] = match[1]
+            saveData();
+        } else {
+            bot.sendMessage(chatId, match[1]+' is a invalid time, 0-23 expected');
+        }
+    }
+});
+
+
 bot.onText(/\/stop/, (msg) => {
     const chatId = msg.chat.id;
     let index = data.chatids.indexOf(chatId);
@@ -194,14 +233,28 @@ var cron = new CronJob('0 * * * *', function() {
             tz = 'Asia/Shanghai';
         }
         let hour = moment().tz(tz).hours();
-        bot.sendSticker(id, stickers[hour % 12]).then(message => {
-            let cid = message.chat.id;
-            let mid = message.message_id;
-            if (data.autodelete[cid] && data.lastid[cid]) {
-                bot.deleteMessage(cid, data.lastid[cid]);
+
+        if (data.sleeptime[id] && data.waketime[id]) {
+            sleep = parseInt(data.sleeptime[id], 10);
+            wake = parseInt(data.waketime[id], 10);
+            if (sleep < wake) {
+                if (hour > sleep && hour < wake) return;
             }
-            data.lastid[cid] = mid;
-            saveData();
+            if (sleep > wake) {
+                if (hour > sleep || hour < wake) return;
+            }
+            if (hour == wake) {
+                bot.sendSticker(id, stickers[14])
+            }
+        }
+        bot.sendSticker(id, stickers[hour % 12]).then(message => {
+        let cid = message.chat.id;
+        let mid = message.message_id;
+        if (data.autodelete[cid] && data.lastid[cid]) {
+            bot.deleteMessage(cid, data.lastid[cid]);
+        }
+        data.lastid[cid] = mid;
+        saveData();
         }).catch(error => {
             let query = error.response.request.uri.query;
             logger.error('[' + error.response.body.error_code + ']' + error.response.body.description);  // => 'ETELEGRAM'
