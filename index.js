@@ -273,7 +273,8 @@ var cron = new CronJob('0 * * * *', function() {
                (error.response.body.description.includes('blocked') ||
                 error.response.body.description.includes('kicked') ||
                 error.response.body.description.includes('not a member') ||
-                error.response.body.description.includes('chat not found'))) {
+                error.response.body.description.includes('chat not found') ||
+                error.response.body.description.includes('upgraded'))) {
                 let matches = query.match(/chat_id=(-?[0-9]*)&/);
                 if (matches && matches[1]) {
                     let cid = Number(matches[1]);
