@@ -15,6 +15,10 @@ This is a [Telegram](https://telegram.org/) bot sending a sticker telling time e
 
 **Enable/Disable auto deleting messages:** `/autodelete [on|off]`
 
+**Set sleep time:** `/sleeptime [0-23]`
+
+**Set wake time:** `/waketime [0-23]`
+
 ## Environment
 - Node.js 8.0+
 
