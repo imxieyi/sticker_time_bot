@@ -271,6 +271,7 @@ var cron = new CronJob('0 * * * *', function() {
                     if (isNaN(cid)) {
                         // Channel name
                         cid = matches[1];
+                        cid = cid.replace('%40', '@');
                     }
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
