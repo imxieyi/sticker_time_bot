@@ -256,23 +256,23 @@ var cron = new CronJob('0 * * * *', function() {
             saveData();
         }).catch(error => {
             let query = error.response.request.uri.query;
-            logger.error('[' + error.response.body.error_code + ']' + error.response.body.description);  // => 'ETELEGRAM'
-            if (query && (error.response.body.error_code === 403 || error.response.body.error_code === 400) &&
-               (error.response.body.description.includes('blocked') ||
-                error.response.body.description.includes('kicked') ||
-                error.response.body.description.includes('not a member') ||
-                error.response.body.description.includes('chat not found') ||
-                error.response.body.description.includes('upgraded') ||
-                error.response.body.description.includes('deactivated') ||
-                error.response.body.description.includes('not enough rights'))) {
-                let matches = query.match(/chat_id=(.*)&/);
-                if (matches && matches[1]) {
-                    let cid = Number(matches[1]);
-                    if (isNaN(cid)) {
-                        // Channel name
-                        cid = matches[1];
-                        cid = cid.replace('%40', '@');
-                    }
+            let matches = query.match(/chat_id=(.*)&/);
+            if (matches && matches[1]) {
+                let cid = Number(matches[1]);
+                if (isNaN(cid)) {
+                    // Channel name
+                    cid = matches[1];
+                    cid = cid.replace('%40', '@');
+                }
+                logger.error('[' + error.response.body.error_code + '](' + cid + ')' + error.response.body.description);  // => 'ETELEGRAM'
+                if (query && (error.response.body.error_code === 403 || error.response.body.error_code === 400) &&
+                (error.response.body.description.includes('blocked') ||
+                    error.response.body.description.includes('kicked') ||
+                    error.response.body.description.includes('not a member') ||
+                    error.response.body.description.includes('chat not found') ||
+                    error.response.body.description.includes('upgraded') ||
+                    error.response.body.description.includes('deactivated') ||
+                    error.response.body.description.includes('not enough rights'))) {
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
                     if (index > -1) {
