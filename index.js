@@ -7,7 +7,7 @@ const moment = require('moment-timezone');
 const CronJob = require('cron').CronJob;
 
 const logger = createLogger({
-    level: 'info',
+    level: (typeof config.level == 'undefined') ? 'info' : config.level,
     format: combine(
         timestamp(),
         prettyPrint()
@@ -258,6 +258,7 @@ var cron = new CronJob('0 * * * *', function() {
                 if (hour > sleep || hour < wake) return;
             }
         }
+        logger.debug('Send to ' + id);
         bot.sendSticker(id, stickers[hour % 12]).then(message => {
             let cid = message.chat.id;
             let mid = message.message_id;
@@ -277,9 +278,13 @@ var cron = new CronJob('0 * * * *', function() {
                 error.response.body.description.includes('upgraded') ||
                 error.response.body.description.includes('deactivated') ||
                 error.response.body.description.includes('not enough rights'))) {
-                let matches = query.match(/chat_id=(-?[0-9]*)&/);
+                let matches = query.match(/chat_id=(.*)&/);
                 if (matches && matches[1]) {
                     let cid = Number(matches[1]);
+                    if (isNaN(cid)) {
+                        // Channel name
+                        cid = matches[1];
+                    }
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
                     if (index > -1) {
