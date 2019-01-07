@@ -272,7 +272,8 @@ var cron = new CronJob('0 * * * *', function() {
                     error.response.body.description.includes('chat not found') ||
                     error.response.body.description.includes('upgraded') ||
                     error.response.body.description.includes('deactivated') ||
-                    error.response.body.description.includes('not enough rights'))) {
+                    error.response.body.description.includes('not enough rights') ||
+                    error.response.body.description.includes('have no rights'))) {
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
                     if (index > -1) {
