@@ -5,6 +5,7 @@ const { combine, timestamp, label, prettyPrint } = format;
 const fs = require('fs');
 const moment = require('moment-timezone');
 const CronJob = require('cron').CronJob;
+const Bottleneck = require('bottleneck');
 
 const logger = createLogger({
     level: (typeof config.level == 'undefined') ? 'info' : config.level,
@@ -246,6 +247,11 @@ bot.on('webhook_error', (error) => {
     logger.error('[webhook_error] ' + error.code);  // => 'EPARSE'
 });
 
+const limiter = new Bottleneck({
+    maxConcurrent: 30,
+    minTime: 33
+});
+
 var cron = new CronJob('0 * * * *', function() {
     var date = new Date();
     logger.info('Cron triggered: ' + date + ', send sticker to ' + data.chatids.length + ' chats');
@@ -267,7 +273,7 @@ var cron = new CronJob('0 * * * *', function() {
             }
         }
         logger.debug('Send to ' + id);
-        bot.sendSticker(id, stickers[hour % 12]).then(message => {
+        limiter.schedule(() => bot.sendSticker(id, stickers[hour % 12])).then(message => {
             let cid = message.chat.id;
             let mid = message.message_id;
             if (data.autodelete[cid] && data.lastid[cid]) {

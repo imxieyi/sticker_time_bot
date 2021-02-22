@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/imxieyi/sticker_time_bot#readme",
   "dependencies": {
+    "bottleneck": "^2.19.5",
     "cron": "^1.4.1",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.21",
