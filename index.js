@@ -45,7 +45,11 @@ if (fs.existsSync('./data.json')) {
 
 function saveData() {
     json = JSON.stringify(data);
-    fs.writeFile('./data.json', json, 'utf8');
+    fs.writeFile('./data.json', json, 'utf8', (err) => {
+        if (err != null) {
+            logger.error('Failed to save data.json: ' + err);
+        }
+    });
 }
 
 if (typeof data == 'undefined' || data == null) {
@@ -196,6 +200,23 @@ bot.onText(/^\/waketime(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     }
 });
 
+bot.onText(/\/nosleep(@sticker_time_bot)?/, (msg) => {
+    const chatId = msg.chat.id;
+	if (!(chatId in data.sleeptime) && !(chatId in data.waketime)) {
+		bot.sendMessage(chatId, 'Sleep time and wake time not set');
+		return;
+	}
+	if (chatId in data.sleeptime) {
+		delete data.sleeptime[chatId];
+	}
+	if (chatId in data.waketime) {
+		delete data.waketime[chatId];
+	}
+    saveData();
+    logger.info(chatId + ' deleted sleep time and wake time');
+    bot.sendMessage(chatId, 'Successfully deleted sleep time');
+});
+
 
 bot.onText(/\/stop/, (msg) => {
     const chatId = msg.chat.id;
@@ -274,7 +295,9 @@ var cron = new CronJob('0 * * * *', function() {
                     error.response.body.description.includes('deactivated') ||
                     error.response.body.description.includes('not enough rights') ||
                     error.response.body.description.includes('have no rights') ||
-                    error.response.body.description.includes('CHAT_SEND_STICKERS_FORBIDDEN'))) {
+                    error.response.body.description.includes('initiate conversation') ||
+                    error.response.body.description.includes('CHAT_SEND_STICKERS_FORBIDDEN') ||
+                    error.response.body.description.includes('CHAT_RESTRICTED'))) {
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
                     if (index > -1) {

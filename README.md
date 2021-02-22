@@ -2,7 +2,7 @@
 Telegram Link: [http://t.me/sticker_time_bot](http://t.me/sticker_time_bot)
 
 ## Introduction
-This is a [Telegram](https://telegram.org/) bot sending a sticker telling time every hour. You can start or stop any time using commands.
+This is a [Telegram](https://telegram.org/) bot sending a sticker indicating time every hour. You can start or stop any time using commands.
 
 ## Commands
 **Start sending stickers:** `/start`
@@ -18,6 +18,8 @@ This is a [Telegram](https://telegram.org/) bot sending a sticker telling time e
 **Set sleep time:** `/sleeptime [0-23]`
 
 **Set wake time:** `/waketime [0-23]`
+
+**Delete sleep and wake time:** `/nosleep`
 
 ## Environment
 - Node.js 8.0+
