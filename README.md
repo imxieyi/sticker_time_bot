@@ -21,6 +21,14 @@ This is a [Telegram](https://telegram.org/) bot sending a sticker indicating tim
 
 **Delete sleep and wake time:** `/nosleep`
 
+**Add hour to alarm list:** `/addhour [0-23]`
+
+**Delete hour from alarm list:** `/delhour [0-23]`
+
+**List hours in alarm list:** `/listhours`
+
+**Clear alarm list:** `/clearhours`
+
 ## Environment
 - Node.js 8.0+
 

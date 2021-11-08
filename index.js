@@ -41,7 +41,7 @@ const bot = new TelegramBot(token, { polling: true });
 if (fs.existsSync('./data.json')) {
     var fdata = fs.readFileSync('./data.json', 'utf8');
     var data = JSON.parse(fdata);
-    logger.info('Old data: ' + JSON.stringify(data));
+    // logger.info('Old data: ' + JSON.stringify(data));
 }
 
 function saveData() {
@@ -59,7 +59,8 @@ if (typeof data == 'undefined' || data == null) {
         chatids: [],
         tzmap: {},
         lastid: {},
-        autodelete: {}
+        autodelete: {},
+        timelist: {},
     };
     saveData();
 }
@@ -88,8 +89,14 @@ if (typeof data.waketime == 'undefined' || data.waketime == null) {
     data.waketime = {};
     saveData();
 }
+
 if (typeof data.autodelete == 'undefined' || data.autodelete == null) {
     data.autodelete = {};
+    saveData();
+}
+
+if (typeof data.timelist == 'undefined' || data.timelist == null) {
+    data.timelist = {};
     saveData();
 }
 
@@ -164,12 +171,17 @@ bot.onText(/^\/sleeptime(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     if (match[3]) {
         var num = parseInt(match[3], 10);
         if (num <= 23 && num >= 0){
-            logger.info(chatId + ' set sleeptime to '+ num +':00');
-            bot.sendMessage(chatId, 'Set sleeptime to '+ num +':00');
             data.sleeptime[chatId] = num;
+            var message = 'Set sleep time to ' + num + ':00';
+            if (chatId in data.timelist) {
+                delete data.timelist[chatId];
+                message += ", list of hours has been deleted.";
+            }
             saveData();
+            logger.info(chatId + ' set sleeptime to '+ num +':00');
+            bot.sendMessage(chatId, message);
         } else {
-            bot.sendMessage(chatId, match[3]+' is a invalid time, 0-23 expected');
+            bot.sendMessage(chatId, match[3]+' is an invalid time, 0-23 expected');
         }
     } else {
         if (chatId in data.sleeptime) {
@@ -185,12 +197,17 @@ bot.onText(/^\/waketime(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
     if (match[3]) {
         var num = parseInt(match[3], 10);
         if (num <= 23 && num >= 0){
-            logger.info(chatId + ' set waketime to '+ num +':00');
-            bot.sendMessage(chatId, 'Set waketime to '+ num +':00');
             data.waketime[chatId] = num;
+            var message = "Set waketime to " + num + ":00";
+            if (chatId in data.timelist) {
+                delete data.timelist[chatId];
+                message += ", list of hours has been deleted.";
+            }
             saveData();
+            logger.info(chatId + ' set waketime to '+ num +':00');
+            bot.sendMessage(chatId, message);
         } else {
-            bot.sendMessage(chatId, match[3]+' is a invalid time, 0-23 expected');
+            bot.sendMessage(chatId, match[3]+' is an invalid time, 0-23 expected');
         }
     } else {
         if (chatId in data.waketime) {
@@ -216,6 +233,100 @@ bot.onText(/\/nosleep(@sticker_time_bot)?/, (msg) => {
     saveData();
     logger.info(chatId + ' deleted sleep time and wake time');
     bot.sendMessage(chatId, 'Successfully deleted sleep time');
+});
+
+bot.onText(/^\/addhour(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
+    const chatId = msg.chat.id;
+    // bot.sendMessage(chatId, match[0]+'  '+match[1]+'  '+match[2]+'  '+match[3])
+    if (match[3]) {
+        var num = parseInt(match[3], 10);
+        if (num <= 23 && num >= 0){
+            if (chatId in data.timelist) {
+                if (data.timelist[chatId].indexOf(num) > -1) {
+                    bot.sendMessage(chatId, 'Time '+ num +':00 already added');
+                    return;
+                }
+                data.timelist[chatId].push(num);
+            } else {
+                data.timelist[chatId] = [num];
+            }
+            var sleepDeleted = false;
+            if (chatId in data.sleeptime) {
+                delete data.sleeptime[chatId];
+                sleepDeleted = true;
+            }
+            if (chatId in data.waketime) {
+                delete data.waketime[chatId];
+                sleepDeleted = true;
+            }
+            logger.info(chatId + ' added time '+ num +':00');
+            var message = 'Added time '+ num +':00';
+            if (sleepDeleted) {
+                message += ', sleep time and wake time deleted';
+            }
+            bot.sendMessage(chatId, message);
+            saveData();
+        } else {
+            bot.sendMessage(chatId, match[3]+' is an invalid time, 0-23 expected');
+        }
+    } else {
+        bot.sendMessage(chatId, 'Usage: /addhour [0-23]');
+    }
+});
+
+bot.onText(/^\/delhour(@sticker_time_bot)?(\s+([^\s]+))?$/, (msg, match) => {
+    const chatId = msg.chat.id;
+    // bot.sendMessage(chatId, match[0]+'  '+match[1]+'  '+match[2]+'  '+match[3])
+    if (match[3]) {
+        var num = parseInt(match[3], 10);
+        if (num <= 23 && num >= 0){
+            if (chatId in data.timelist) {
+                var index = data.timelist[chatId].indexOf(num);
+                if (index > -1) {
+                    data.timelist[chatId].splice(index, 1);
+                    var message = 'Deleted time '+ num +':00';
+                    if (data.timelist[chatId].length == 0) {
+                        delete data.timelist[chatId];
+                        message += ', list of hours deleted';
+                    }
+                    logger.info(chatId + ' deleted time '+ num +':00');
+                    bot.sendMessage(chatId, message);
+                    saveData();
+                    return;
+                }
+            }
+            bot.sendMessage(chatId, 'Time '+ num +':00 not added');
+        } else {
+            bot.sendMessage(chatId, match[3]+' is an invalid time, 0-23 expected');
+        }
+    } else {
+        bot.sendMessage(chatId, 'Usage: /delhour [0-23]');
+    }
+});
+
+bot.onText(/^\/listhours/, (msg, match) => {
+    const chatId = msg.chat.id;
+    if (chatId in data.timelist) {
+        var list = data.timelist[chatId];
+        var str = '';
+        for (var i = 0; i < list.length; i++) {
+            str += list[i] + ':00\n';
+        }
+        bot.sendMessage(chatId, 'List of hours:\n'+str);
+    } else {
+        bot.sendMessage(chatId, 'No hours added');
+    }
+});
+
+bot.onText(/^\/clearhours/, (msg, match) => {
+    const chatId = msg.chat.id;
+    if (chatId in data.timelist) {
+        delete data.timelist[chatId];
+        logger.info(chatId + ' deleted list of hours');
+        bot.sendMessage(chatId, 'Successfully deleted list of hours');
+    } else {
+        bot.sendMessage(chatId, 'No hours added');
+    }
 });
 
 
@@ -254,7 +365,7 @@ const limiter = new Bottleneck({
 
 var cron = new CronJob('0 * * * *', function() {
     var date = new Date();
-    logger.info('Cron triggered: ' + date + ', send sticker to ' + data.chatids.length + ' chats');
+    var chatsSent = 0;
     data.chatids.forEach(function (id) {
         let tz = data.tzmap[id];
         if (!tz) {
@@ -270,6 +381,11 @@ var cron = new CronJob('0 * * * *', function() {
             }
             if (sleep > wake) {
                 if (hour > sleep || hour < wake) return;
+            }
+        }
+        if (hour in data.timelist) {
+            if (data.timelist[id].indexOf(hour) === -1) {
+                return;
             }
         }
         logger.debug('Send to ' + id);
@@ -303,7 +419,8 @@ var cron = new CronJob('0 * * * *', function() {
                     error.response.body.description.includes('have no rights') ||
                     error.response.body.description.includes('initiate conversation') ||
                     error.response.body.description.includes('CHAT_SEND_STICKERS_FORBIDDEN') ||
-                    error.response.body.description.includes('CHAT_RESTRICTED'))) {
+                    error.response.body.description.includes('CHAT_RESTRICTED') ||
+                    error.response.body.description.includes('was deleted'))) {
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
                     if (index > -1) {
@@ -313,10 +430,13 @@ var cron = new CronJob('0 * * * *', function() {
                         delete data.autodelete[cid];
                         delete data.sleeptime[cid];
                         delete data.waketime[cid];
+                        delete data.timelist[cid];
                         saveData();
                     }
                 }
             }
-        })
+        });
+        chatsSent++;
     });
+    logger.info('Cron triggered. Send stickers to ' + chatsSent + '/' + data.chatids.length + ' chats');
 }, null, true, 'Asia/Shanghai');
