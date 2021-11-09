@@ -383,7 +383,7 @@ var cron = new CronJob('0 * * * *', function() {
                 if (hour > sleep || hour < wake) return;
             }
         }
-        if (hour in data.timelist) {
+        if (id in data.timelist) {
             if (data.timelist[id].indexOf(hour) === -1) {
                 return;
             }
