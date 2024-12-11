@@ -421,7 +421,8 @@ var cron = new CronJob('0 * * * *', function() {
                     error.response.body.description.includes('CHAT_SEND_STICKERS_FORBIDDEN') ||
                     error.response.body.description.includes('CHAT_RESTRICTED') ||
                     error.response.body.description.includes('was deleted') ||
-                    error.response.body.description.includes('PEER_ID_INVALID'))) {
+                    error.response.body.description.includes('PEER_ID_INVALID') ||
+                    error.response.body.description.includes('TOPIC_CLOSED'))) {
                     logger.info('Blocked by ' + cid);
                     let index = data.chatids.indexOf(cid);
                     if (index > -1) {
